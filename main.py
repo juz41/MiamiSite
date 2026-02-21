@@ -104,14 +104,14 @@ def index():
 @app.route("/moe")
 def moe_page():
     battles = get_recent_battles(player_id, tank_id)
-    latest_battle = battles[0] if battles else None
-
+    latest_battle = next(battle for battle in battles if float(battle.get("moe", 0)) != 0)
     # Get tank stats from overall MOE (to check 3 marks)
     tank_stats = get_tank_moe(player_name, player_id, tank_id)
     tank_image = tank_stats["tank_image"]
     overall_moe_marks = tank_stats["moe"]  # integer marks 0-3
     three_marks_answer = "Yes" if overall_moe_marks >= 3 else "No"
 
+    
     # Current MOE progress comes from the most recent battle
     if latest_battle:
         try:
