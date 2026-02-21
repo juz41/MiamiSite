@@ -104,7 +104,7 @@ def index():
 @app.route("/moe")
 def moe_page():
     battles = get_recent_battles(player_id, tank_id)
-    latest_battle = next(battle for battle in battles if float(battle.get("moe", 0)) != 0, None)
+    latest_battle = next((battle for battle in battles if float(battle.get("moe", 0)) != 0), None)
     # Get tank stats from overall MOE (to check 3 marks)
     tank_stats = get_tank_moe(player_name, player_id, tank_id)
     tank_image = tank_stats["tank_image"]
@@ -113,6 +113,7 @@ def moe_page():
 
     
     # Current MOE progress comes from the most recent battle
+    # print(latest_battle)
     if latest_battle:
         current_moe_percent = float(latest_battle.get("moe", 0.0))
         moe_diff = float(latest_battle.get("moe_diff", 0.0))
@@ -207,7 +208,7 @@ def moe_page():
                 </div>
 
                 <div class="right">
-                    {% if b.moe|float == 0 %}
+                    {% if b.moe|default(0)|float == 0.0 %}
                         <div class="ragequit">RAGEQUIT</div>
                     {% endif %}
 
