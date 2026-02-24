@@ -194,4 +194,6 @@ def moe_page():
     return render_template_string(
         html,
         battles=battles,
+        player_name=player_name,
+        tank_name=tank_name
     )
