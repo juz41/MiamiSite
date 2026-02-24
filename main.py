@@ -29,7 +29,7 @@ def get_most_recent_battle(player_id, tank_id):
     return get_recent_battles(player_id, tank_id)[0]
 
 def get_player_stats(player_name, player_id):
-    query = f"https://tomato.gg/_next/data/ChBl5gn1Emb2oRQwzfDlf/en/stats/{player_name}-{player_id}/EU.json?id={player_name}-{player_id}&server=EU"
+    query = f"https://tomato.gg/_next/data/fuj5HP9imK9yDtNHkIC5/en/stats/{player_name}-{player_id}/EU.json?id={player_name}-{player_id}&server=EU"
     return requests.get(query).json()
 
 def get_tank_moe(player_name, player_id, tank_id):
