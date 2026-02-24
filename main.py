@@ -33,6 +33,7 @@ def get_player_stats(player_name, player_id):
     return requests.get(query).json()
 
 def get_tank_moe(player_name, player_id, tank_id):
+    # return {"moe": 2, "mastery": 0, "tank_image": "https://eu-wotp.wgcdn.co/dcont/tankopedia_images/f108_panhard_ebr_105/f108_panhard_ebr_105_image_resized.png"}
     stats = get_player_stats(player_name, player_id)
     tanks = stats.get("pageProps", {}).get("overallStats", {}).get("data", {}).get("tanks", [])
     tank = next((t for t in tanks if t["id"] == tank_id), None)
@@ -104,24 +105,6 @@ def index():
 @app.route("/moe")
 def moe_page():
     battles = get_recent_battles(player_id, tank_id)
-    latest_battle = next((battle for battle in battles if float(battle.get("moe", 0)) != 0), None)
-    # Get tank stats from overall MOE (to check 3 marks)
-    tank_stats = get_tank_moe(player_name, player_id, tank_id)
-    tank_image = tank_stats["tank_image"]
-    overall_moe_marks = tank_stats["moe"]  # integer marks 0-3
-    three_marks_answer = "Yes" if overall_moe_marks >= 3 else "No"
-
-    
-    # Current MOE progress comes from the most recent battle
-    # print(latest_battle)
-    if latest_battle:
-        current_moe_percent = float(latest_battle.get("moe", 0.0))
-        moe_diff = float(latest_battle.get("moe_diff", 0.0))
-
-        progress_text = f"{current_moe_percent:.2f}% (Δ {moe_diff:+.2f}%)"
-    else:
-        progress_text = "0.00% (Δ 0.00%)"
-
     html = """
     <!doctype html>
     <html>
@@ -133,17 +116,6 @@ def moe_page():
       <style>
         body { background: #0f1115; color: white; }
         .page-wrapper { display: flex; gap: 20px; align-items: flex-start; }
-        .left-widget {
-            width: 250px;
-            background: #1a1d25;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            flex-shrink: 0;
-        }
-        .left-widget img { width: 150px; margin-bottom: 10px; border-radius: 8px; }
-        .left-widget .progress-text { font-size: 18px; font-weight: bold; margin-top: 8px; color: #ffd700; }
-        .left-widget .three-marks { font-size: 16px; margin-top: 6px; color: #00ff00; }
         .battle-card {
             background: #1a1d25;
             border-radius: 12px;
@@ -173,14 +145,6 @@ def moe_page():
         <h3>Recent Battles — {{ player_name }} ({{ tank_name }})</h3>
 
         <div class="page-wrapper">
-          <!-- Left Widget -->
-          <div class="left-widget">
-            <img src="{{ tank_image }}" alt="{{ tank_name }}">
-            <div>{{ tank_name }}</div>
-            <div class="progress-text">{{ progress_text }}</div>
-            <div class="three-marks">3 marks? {{ three_marks_answer }}</div>
-          </div>
-
           <!-- Battle Cards -->
           <div class="flex-grow-1">
           {% for b in battles %}
@@ -230,9 +194,4 @@ def moe_page():
     return render_template_string(
         html,
         battles=battles,
-        player_name=player_name,
-        tank_name=tank_name,
-        tank_image=tank_image,
-        progress_text=progress_text,
-        three_marks_answer=three_marks_answer
     )
